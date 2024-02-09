@@ -1,11 +1,16 @@
 package service
 
-import "api/domain"
+import (
+	"api/domain"
+	"api/dto"
+)
+
+//go:generate mockgen -destination=../mocks/service/mockCustomerService.go -package=service api/service customerService
 
 // CustomerService interface defines the methods for managing customers
 type CustomerService interface {
-	GetAllCustomers() ([]domain.Customer, error)
-	GetCustomerById(id int) (*domain.Customer, error)
+	GetAllCustomers() ([]dto.CustomerResponse, error)
+	GetCustomerById(id int) (*dto.CustomerResponse, error)
 	CreateCustomer(newCustomer domain.Customer) (*domain.Customer, error)
 }
 
@@ -15,8 +20,27 @@ type DefaultCustomerService struct {
 }
 
 // GetAllCustomers retrieves all customers
-func (s DefaultCustomerService) GetAllCustomers() ([]domain.Customer, error) {
-	return s.repo.FindAll()
+func (s DefaultCustomerService) GetAllCustomers() ([]dto.CustomerResponse, error) {
+	// retrive all the customers from the repository
+	c, err := s.repo.FindAll()
+	if err != nil {
+		return nil, err
+	}
+
+	// Create an empty slice to store the responses
+	var responses []dto.CustomerResponse
+
+	//Iterate over each customer returned by the repository
+	for _, customer := range c {
+		// Convert each customer to a CustomerResponse using the ToDO() Method
+		response := customer.ToDto()
+		// Append the CustomerResponse to the response slice
+		responses = append(responses, response)
+
+	}
+
+	return responses, nil
+
 }
 
 // NewCustomerService creates a new instance of DefaultCustomerService
@@ -25,8 +49,17 @@ func NewCustomerService(repository domain.CustomerRepository) DefaultCustomerSer
 }
 
 // GetCustomerById retrieves a customer by ID
-func (c DefaultCustomerService) GetCustomerById(id int) (*domain.Customer, error) {
-	return c.repo.GetCustomerById(id)
+func (s DefaultCustomerService) GetCustomerById(id int) (*dto.CustomerResponse, error) {
+	c, err := s.repo.GetCustomerById(id)
+	if err != nil {
+		return nil, err
+
+	}
+
+	c.ToDto()
+
+	response := c.ToDto()
+	return &response, nil
 }
 
 // CreateCustomer creates a new customer

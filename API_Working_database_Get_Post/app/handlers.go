@@ -2,20 +2,13 @@ package app
 
 import (
 	"api/domain"
+	"api/logger"
 	"api/service"
-	"fmt"
-	"log"
 	"net/http"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
-
-type Customer struct {
-	Name    string `json:"full_name" xml:"full_name"`
-	City    string `json:"city" xml:"city"`
-	Zipcode string `json:"zipcode" xml:"zipcode"`
-}
 
 // This will be having the dependencies of the service
 
@@ -24,19 +17,15 @@ type CustomerHandlers struct {
 }
 
 func (ch *CustomerHandlers) GetAllCustomer(c *gin.Context) {
-	// customers := []Customer{
-	// 	{Name: "Kavya", City: "Banglore", Zipcode: "560003"},
-	// 	{Name: "Prakurthi", City: "Hyderabad", Zipcode: "185754"},
-	// 	{Name: "Tapasya", City: "Banglore", Zipcode: "560043"},
-	// }
-
-	customers, _ := ch.service.GetAllCustomers()
-
-	if c.GetHeader("Content-type") == "application/xml" {
-		c.XML(http.StatusOK, customers)
-	} else {
-		c.JSON(http.StatusOK, customers)
+	customers, err := ch.service.GetAllCustomers()
+	if err != nil {
+		// Handle the error
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to retrieve customers"})
+		return
 	}
+
+	// Respond with JSON
+	c.JSON(http.StatusOK, customers)
 }
 
 func (ch *CustomerHandlers) GetCustomerById(c *gin.Context) {
@@ -50,7 +39,7 @@ func (ch *CustomerHandlers) GetCustomerById(c *gin.Context) {
 
 	customer, err := ch.service.GetCustomerById(idint)
 	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": fmt.Sprintf("%s", err.Error())})
+		c.JSON(http.StatusNotFound, gin.H{"error": "Customer not found...."})
 		return
 	}
 	c.JSON(http.StatusOK, customer)
@@ -66,7 +55,7 @@ func (ch *CustomerHandlers) CreateCustomer(c *gin.Context) {
 
 	_, err := ch.service.CreateCustomer(newCustomer) // Corrected method call
 	if err != nil {
-		log.Println("Error creating customer:", err)
+		logger.Error("Error creating customer:")
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create customer"})
 		return
 	}
