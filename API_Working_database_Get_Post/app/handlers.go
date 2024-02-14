@@ -29,13 +29,17 @@ func (ch *CustomerHandlers) GetAllCustomer(c *gin.Context) {
 }
 
 func (ch *CustomerHandlers) GetCustomerById(c *gin.Context) {
-	id := c.Query("id") // Now the customer is accepting values in the query format
-	idint, err := strconv.Atoi(id)
+	//id := c.Query("id") // Now the customer is accepting values in the query format
+	
+    customer_id := c.Param("id")
+ 
+	idint, err := strconv.Atoi(customer_id)
 
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid customer id the customer id , must be numeric..."})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Invalid customer id the customer id , must be numeric..."})
 		return
 	}
+
 
 	customer, err := ch.service.GetCustomerById(idint)
 	if err != nil {
@@ -44,6 +48,7 @@ func (ch *CustomerHandlers) GetCustomerById(c *gin.Context) {
 	}
 	c.JSON(http.StatusOK, customer)
 }
+
 
 func (ch *CustomerHandlers) CreateCustomer(c *gin.Context) {
 	var newCustomer domain.Customer

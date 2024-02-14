@@ -4,7 +4,6 @@ import (
 	"api/domain" // Assuming CustomerHandlers is defined in handlers package
 	"api/service"
 	"log"
-	"os"
 
 	"github.com/gin-gonic/gin"
 )
@@ -37,15 +36,20 @@ func Start() {
 	router.GET("/customers/:id", ch.GetCustomerById)
 	router.POST("/customers", ch.CreateCustomer)
 
-	addr := os.Getenv("ADDR")
-	port := os.Getenv("PORT")
-	if addr == "" || port == "" {
-		log.Fatal("ADDR and PORT environment variables are not set")
-	}
+	// addr := os.Getenv("ADDR")
+	// port := os.Getenv("PORT")
+	// if addr == "" || port == "" {
+	// 	log.Fatal("ADDR and PORT environment variables are not set")
+	// }
 
-	err := router.Run(addr + ":" + port)
+	// err := router.Run(addr + ":" + port)
+	// if err != nil {
+	// 	log.Fatal(err)
+	// }
+
+	err := router.Run("localhost:8000")
 	if err != nil {
-		log.Fatal(err)
+		log.Fatal("Error starting server: ", err)
 	}
 
 }

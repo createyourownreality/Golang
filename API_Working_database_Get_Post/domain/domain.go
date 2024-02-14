@@ -3,12 +3,12 @@ package domain
 import "api/dto"
 
 type Customer struct {
-	Id          int    `db:"id"`
-	Name        string `db:"name"`
-	City        string `db:"city"`
-	Zipcode     string `db:"zipcode"`
-	DateofBirth string `db:"date_of_birth"`
-	Status      string `db:"status"`
+	Id          int    `db:"id" json:"id"`
+	Name        string `db:"name" json:name`
+	City        string `db:"city" json:"city"`
+	Zipcode     string `db:"zipcode" json:"zipcode"`
+	DateofBirth string `db:"date_of_birth" json:"date_of_birth"`
+	Status      string `db:"status" json : "date_of birth"`
 }
 
 // Defining our repository Cutomer repository (This repository helps us finding all the cutomers from the server side)

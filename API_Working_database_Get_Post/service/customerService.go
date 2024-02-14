@@ -5,13 +5,13 @@ import (
 	"api/dto"
 )
 
-//go:generate mockgen -destination=../mocks/service/mockCustomerService.go -package=service api/service customerService
+//go:generate mockgen -destination=../mocks/service/mockCustomerService.go -package=service api/service CustomerService
 
 // CustomerService interface defines the methods for managing customers
 type CustomerService interface {
 	GetAllCustomers() ([]dto.CustomerResponse, error)
 	GetCustomerById(id int) (*dto.CustomerResponse, error)
-	CreateCustomer(newCustomer domain.Customer) (*domain.Customer, error)
+	CreateCustomer(newCustomer domain.Customer) (*dto.CustomerResponse, error)
 }
 
 // DefaultCustomerService is the implementation of the CustomerService interface
@@ -63,10 +63,12 @@ func (s DefaultCustomerService) GetCustomerById(id int) (*dto.CustomerResponse, 
 }
 
 // CreateCustomer creates a new customer
-func (s DefaultCustomerService) CreateCustomer(newCustomer domain.Customer) (*domain.Customer, error) {
+func (s DefaultCustomerService) CreateCustomer(newCustomer domain.Customer) (*dto.CustomerResponse, error) {
 	createdCustomer, err := s.repo.CreateCustomer(newCustomer)
 	if err != nil {
 		return nil, err
 	}
-	return createdCustomer, nil
+
+	response := createdCustomer.ToDto()
+	return &response, nil
 }
